@@ -7,7 +7,7 @@ ssl:
 	openssl x509 -req -days 365 -CA aliyun.root.crt -CAkey aliyun.root.key -set_serial 0 -in aliyun.com.csr -out aliyun.com.crt
 
 install: ssl
-	curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+	curl -LO https://dl.k8s.io/release/v1.20.11/bin/linux/amd64/kubectl 
 	cp kubectl /usr/local/bin/kubectl
 	chmod +x /usr/local/bin/kubectl
 	kubectl --kubeconfig  ${USER_KUBECONFIG} create -n istio-system secret tls istio-ingressgateway-certs --key ./aliyun.com.key --cert ./aliyun.com.crt
@@ -19,11 +19,7 @@ install: ssl
 	kubectl --kubeconfig ${ASM_KUBECONFIG} apply -f ./deploy/virtualservice.yaml
 
 perf_disable:
-	./demo/perf.sh disable
+	./perf.sh disable
 
 perf_enable:
-	./demo/perf.sh enable
-
-
-perf_test:
-	./demo/perf.sh enable
+	./perf.sh enable

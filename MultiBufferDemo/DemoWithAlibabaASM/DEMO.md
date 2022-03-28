@@ -1,54 +1,29 @@
-## 前提
+# create resource in Alibaba cloud
+  1. create a VPC and a vSwitch, all the following resources use this VPC and vSwitch.
+  2. create an ACK Kubernetes cluster with 2 nodes, node profile must be g7 profile Ice Lake platform, ACK Pro, K8S version 1.20.11-aliyun.1, runtime Docker 19.03.15; make sure SNAT enabled for worker node to access internet to pull image. 
+  3. create an ASM Pro version, Istio version 1.11.540,attach ACK Kubernetes cluster as data plane.  
+  4. create an ECS instance as kubectl and k6 client.
 
-- 创建一个ACK 集群 （https://cs.console.aliyun.com) ,其中配置 Worker 节点时需要选择 g7 规格类型的节点
+## ECS setup
+1. Add security group and public EIP for ECS instance, ssh to ECS
+      1.1 yum install -y git
+      1.2 git clone https://github.com/whu16/ServiceMeshDemo.git
+2. Create user_kube_config.conf and asm_kube_config.conf by copy ACK Kubernetes cluster kubeconfig and ASM kubeconfig
+3. make install
+4. Check K8s resources readiness
+5. install k6
+      5.1 yum install https://dl.k6.io/rpm/repo.rpm
+      5.2 yum install --nogpgcheck k6
 
-  ![image-20211109195642185](./img/image-20211109195642185.png)
+6. export KUBECONFIG=kubeconf to use kubectl
 
-- 创建一个ASM 实例 (https://servicemesh.console.aliyun.com/), 版本选择1.10+ 专业版
-
-  ![image-20211109195925816](./img/image-20211109195925816.png)
-
-- ASM 实例添加第一步创建的ACK 集群
-
-- ECS 一台用户作为压测机器: perf-client (同一个VPC)
-
+## Test K6
+1.  make perf_disable/make perf_enable
+2.  apply account in k6.io and get the API token from your account
+3.  modify the perf.sh to set up the correct API token
+4.  make perf_disable
+5.  turn on MultiBuffer at ASM setup page 右上角功能设置 to checkbox the multibuffer
+4.  delete the istio-ingressgateway under istiosystem name space. The gateway will auto recovery.
+5.  make perf_enable
+6.  you will have 2 times tests at k6.io
   
-
-## Install Demo 
-
-
-
-![image-20211109201338195](./img/image-20211109201338195.png)
-
-
-
-Git clone 本项目到ECS 压测机器 perf-client
-
-以Root 用户进行操作：
-
-首先配置user_kube_config.conf 和 asm_kube_config.conf 分别指向用户K8s 集群的kubeconfig 和ASM 实例的kubeconfig
-
-然后执行：make install 
-
-
-安装Nginx backend 服务以及ASM 网关以及相关配置；
-
-
-
-具体可参考ASM 官方文档：https://help.aliyun.com/document_detail/164654.html
-
-
-
-## 性能效果验证
-
-压测工具我们采用k6 ,需要在压测机器上进行安装，参考： https://k6.io/docs/getting-started/installation/
-
-
-
-- 开启multibuffer 功能后，执行
-
- make perf_enable
-
-- 关闭multibuffer 功能后，执行
-
- make perf_disable
