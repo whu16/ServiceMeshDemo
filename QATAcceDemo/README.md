@@ -1,0 +1,1 @@
+This is for QAT acceleration for TLS handshake in Envoy ingress gateway. Current version is based on QAT card. We will migrate to next generation Intel platform for integrated QAT.
