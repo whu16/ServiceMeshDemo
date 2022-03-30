@@ -6,8 +6,10 @@
 
 ## ECS setup
 1. Connect the ECS client using workbench and you need add security group for connection. 
-      1.1 yum install -y git
-      1.2 git clone https://github.com/whu16/ServiceMeshDemo.git
+```shell
+    yum install -y git
+    git clone https://github.com/whu16/ServiceMeshDemo.git
+    
 2. Create user_kube_config.conf and asm_kube_config.conf. Copy ACK Kubernetes cluster kubeconfig and ASM kubeconfig in their connection information page into the conf files.
 3. make install
 4. Check K8s resources readiness
