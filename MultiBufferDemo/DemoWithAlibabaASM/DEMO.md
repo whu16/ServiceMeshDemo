@@ -9,14 +9,15 @@
 ```shell
     yum install -y git
     git clone https://github.com/whu16/ServiceMeshDemo.git
-    
+```    
 2. Create user_kube_config.conf and asm_kube_config.conf. Copy ACK Kubernetes cluster kubeconfig and ASM kubeconfig in their connection information page into the conf files.
 3. make install
 4. Check K8s resources readiness
 5. install k6
-      5.1 yum install https://dl.k6.io/rpm/repo.rpm
-      5.2 yum install --nogpgcheck k6
-
+```shell
+    yum install https://dl.k6.io/rpm/repo.rpm
+    yum install --nogpgcheck k6
+```
 6. export KUBECONFIG=user_kube_config.conf to use kubectl
 
 ## Test K6
