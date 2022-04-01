@@ -6,10 +6,14 @@ ssl:
 	openssl req -out aliyun.com.csr -newkey rsa:2048 -nodes -keyout aliyun.com.key -subj "/CN=aliyun.com/O=myexample organization"
 	openssl x509 -req -days 365 -CA aliyun.root.crt -CAkey aliyun.root.key -set_serial 0 -in aliyun.com.csr -out aliyun.com.crt
 
-install: ssl
+install:
 	curl -LO https://dl.k8s.io/release/v1.20.11/bin/linux/amd64/kubectl 
 	cp kubectl /usr/local/bin/kubectl
 	chmod +x /usr/local/bin/kubectl
+	yum install -y https://dl.k6.io/rpm/repo.rpm
+	yum install -y --nogpgcheck k6
+
+k8resouce: ssl
 	kubectl --kubeconfig  ${USER_KUBECONFIG} create -n istio-system secret tls istio-ingressgateway-certs --key ./aliyun.com.key --cert ./aliyun.com.crt
 	kubectl --kubeconfig ${USER_KUBECONFIG} create configmap myexample-nginx-configmap --from-file=nginx.conf=./deploy/myexample-nginx.conf
 	kubectl --kubeconfig ${USER_KUBECONFIG} apply -f ./deploy/backend.yaml
