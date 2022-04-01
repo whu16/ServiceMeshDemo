@@ -12,8 +12,9 @@ install:
 	chmod +x /usr/local/bin/kubectl
 	yum install -y https://dl.k6.io/rpm/repo.rpm
 	yum install -y --nogpgcheck k6
+	chmod +x ./perf.sh
 
-k8resouce: ssl
+k8resource: ssl
 	kubectl --kubeconfig  ${USER_KUBECONFIG} create -n istio-system secret tls istio-ingressgateway-certs --key ./aliyun.com.key --cert ./aliyun.com.crt
 	kubectl --kubeconfig ${USER_KUBECONFIG} create configmap myexample-nginx-configmap --from-file=nginx.conf=./deploy/myexample-nginx.conf
 	kubectl --kubeconfig ${USER_KUBECONFIG} apply -f ./deploy/backend.yaml
