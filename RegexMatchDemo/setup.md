@@ -8,15 +8,18 @@ Both of the following options are possible. It is recommended to build from the 
 
    ```sh
    # Install dependencies
+   apt-get update & apt-get install -y wget git
    wget -O /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-$([ $(uname -m) = "aarch64" ] && echo "arm64" || echo "amd64")
    chmod +x /usr/local/bin/bazel
+   
    apt-get install -y autoconf automake cmake curl libtool make ninja-build patch python3-pip unzip virtualenv
 
    # Build
+   apt-get install -y git
    git clone https://github.com/envoyproxy/envoy
    cd envoy
    git checkout 2572ce6de1a582547a30b59b40f0c614c713f03a
-   bazel build -c opt //contrib/exe：envoy-static
+   bazel build -c opt //contrib/exe:envoy-static
 
    # Run
    bazel-bin/contrib/exe/envoy-static --concurrency 1 -c <PATH_TO_CONF>
@@ -26,8 +29,9 @@ Both of the following options are possible. It is recommended to build from the 
 
    ```sh
    # Run
-   docker run --rm -p 80:80 envoyproxy/envoy-contrib-dev:2572ce6de1a582547a30b59b40f0c614c713f03a --concurrency 1 --config-yaml "$(cat <PATH_TO_CONF>)"
+   docker run --rm -p 80:80 -v host_configfile_path:container_configurefile_path envoyproxy/envoy-contrib-dev:2572ce6de1a582547a30b59b40f0c614c713f03a --concurrency 1 -c container_configurefile_path/configure_file
    ```
+
 
 The provided configurations route requests from 0.0.0.0:80 to 127.0.0.1:8080 by default. If you want to listen on different port than 80, change the address in the 6th line, if you are running Envoy with Docker, change the port map command. If the upstream service is deployed in other address, or if you are running Envoy with Docker, change the address in the end two line.
 
