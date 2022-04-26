@@ -14,17 +14,27 @@ install:
 	yum install -y --nogpgcheck k6
 	chmod +x ./perf.sh
 
-k8resource: ssl
+k8s_create: ssl
+	kubectl --kubeconfig ${ASM_KUBECONFIG} label namespace default istio-injection=enabled
+
+k8s_apply:
 	kubectl --kubeconfig  ${USER_KUBECONFIG} create -n istio-system secret tls istio-ingressgateway-certs --key ./aliyun.com.key --cert ./aliyun.com.crt
 	kubectl --kubeconfig ${USER_KUBECONFIG} create configmap myexample-nginx-configmap --from-file=nginx.conf=./deploy/myexample-nginx.conf
 	kubectl --kubeconfig ${USER_KUBECONFIG} apply -f ./deploy/backend.yaml
 	kubectl --kubeconfig ${ASM_KUBECONFIG} apply -f ./deploy/istiogateway.yaml 
-	kubectl --kubeconfig ${ASM_KUBECONFIG} label namespace default istio-injection=enabled
 	kubectl --kubeconfig ${ASM_KUBECONFIG} apply -f ./deploy/gateway.yaml
 	kubectl --kubeconfig ${ASM_KUBECONFIG} apply -f ./deploy/virtualservice.yaml
 
+k8s_del:
+	kubectl --kubeconfig ${USER_KUBECONFIG} -n istio-system delete secret/istio-ingressgateway-certs
+	kubectl --kubeconfig ${USER_KUBECONFIG} delete configmap/myexample-nginx-configmap
+	kubectl --kubeconfig ${USER_KUBECONFIG} delete -f ./deploy/backend.yaml
+	kubectl --kubeconfig ${ASM_KUBECONFIG} delete -f ./deploy/istiogateway.yaml
+	kubectl --kubeconfig ${ASM_KUBECONFIG} delete -f ./deploy/gateway.yaml
+	kubectl --kubeconfig ${ASM_KUBECONFIG} delete -f ./deploy/virtualservice.yaml
+
 perf_disable:
-	./perf.sh disable
+	./perf.sh disable local
 
 perf_enable:
-	./perf.sh enable
+	./perf.sh enable local
